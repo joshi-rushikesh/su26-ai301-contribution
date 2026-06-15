@@ -1,11 +1,11 @@
 # AI301 Contribution README
 
-Student: Rushikesh Joshi
-GitHub: @joshi-rushikesh
-Course: CodePath AI301 — Summer 2026
-Selected Repository: nightscout/cgm-remote-monitor
-Selected Issue: Custom WebHook Support #5742
-Fork: https://github.com/joshi-rushikesh/cgm-remote-monitor
+Student: Rushikesh Joshi    
+GitHub: @joshi-rushikesh  
+Course: CodePath AI301 - Summer 2026  
+Selected Repository: nightscout/cgm-remote-monitor  
+Selected Issue: Custom WebHook Support #5742  
+Fork: https://github.com/joshi-rushikesh/cgm-remote-monitor  
 
 ---
 
@@ -17,12 +17,12 @@ Phase I Complete
 
 ### Chosen Issue
 
-**Issue Title:** Custom WebHook Support
-**Issue Number:** nightscout/cgm-remote-monitor#5742
-**Issue Link:** https://github.com/nightscout/cgm-remote-monitor/issues/5742
-**Repository:** https://github.com/nightscout/cgm-remote-monitor
-**Fork:** https://github.com/joshi-rushikesh/cgm-remote-monitor
-**Labels:** feature request, help wanted
+**Issue Title:** Custom WebHook Support   
+**Issue Number:** nightscout/cgm-remote-monitor#5742  
+**Issue Link:** https://github.com/nightscout/cgm-remote-monitor/issues/5742  
+**Repository:** https://github.com/nightscout/cgm-remote-monitor  
+**Fork:** https://github.com/joshi-rushikesh/cgm-remote-monitor  
+**Labels:** feature request, help wanted  
 
 ### Problem Summary
 
@@ -36,12 +36,12 @@ This issue is a good learning opportunity because it requires me to understand a
 
 ### Issue Selection Checklist
 
-* I can explain the problem in one sentence: Yes — Nightscout needs configurable custom webhook support so events can be sent to user-defined endpoints instead of only through IFTTT.
+* I can explain the problem in one sentence: Yes - Nightscout needs configurable custom webhook support so events can be sent to user-defined endpoints instead of only through IFTTT.
 * Scope looks realistic for 3–4 weeks: Yes, as long as I focus on the existing notification/webhook path and keep the first implementation small.
-* Matches my skills or things I can learn quickly: Yes — this involves JavaScript/Node.js, environment configuration, HTTP requests, and API-style integration work.
-* Issue is active and claimable: Mostly yes — it is open, unassigned, labeled `help wanted`, and has no linked PR, though it is an older issue so I asked maintainers for confirmation.
-* There is helpful context: Yes — the issue explains the current IFTTT throttling problem and gives example configuration variables.
-* The project has setup/contribution docs: Yes — the repository includes README and contribution documentation to review.
+* Matches my skills or things I can learn quickly: Yes - this involves JavaScript/Node.js, environment configuration, HTTP requests, and API-style integration work.
+* Issue is active and claimable: Mostly yes - it is open, unassigned, labeled `help wanted`, and has no linked PR, though it is an older issue so I asked maintainers for confirmation.
+* There is helpful context: Yes - the issue explains the current IFTTT throttling problem and gives example configuration variables.
+* The project has setup/contribution docs: Yes - the repository includes README and contribution documentation to review.
 
 ### Initial Codebase Areas to Investigate
 
