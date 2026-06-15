@@ -66,6 +66,7 @@ A successful contribution should preserve the existing IFTTT behavior while addi
 * Commented on the GitHub issue introducing myself, explaining my understanding of the issue, and asking for maintainer pointers.
 * Attempted to claim the issue in the CodePath issue sheet, but the sheet was not editable on my end.
 * Posted in Slack asking staff/TFMs to confirm or mark the issue as claimed because I could not edit the sheet.
+* Posted my Phase I completion milestone in the CodePath celebration channel.
 
 ---
 
