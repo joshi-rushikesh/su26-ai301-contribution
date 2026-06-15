@@ -1,6 +1,6 @@
 # AI301 Contribution README
 
-Student: Rushi Joshi  
+Student: Rushikesh Joshi  
 GitHub: @joshi-rushikesh  
 Course: CodePath AI301 — Summer 2026  
 Selected Repository: nightscout/cgm-remote-monitor  
