@@ -60,13 +60,12 @@ This issue is a good learning opportunity because it requires me to understand a
 A successful contribution should preserve the existing IFTTT behavior while adding a configurable custom webhook path. The feature should likely allow users to define a custom webhook URL and event mapping through environment/configuration variables, send the relevant event data to that endpoint, and include tests or documentation explaining how the new configuration works. Because this is related to notifications, I will test in a development environment and avoid making assumptions about production medical alert reliability.
 
 ### Communication Log
-
-* Forked the repository to my GitHub account.
-* Selected the Nightscout custom webhook issue for Phase I.
-* Commented on the GitHub issue introducing myself, explaining my understanding of the issue, and asking for maintainer pointers.
-* Attempted to claim the issue in the CodePath issue sheet, but the sheet was not editable on my end.
-* Posted in Slack asking staff/TFMs to confirm or mark the issue as claimed because I could not edit the sheet.
-* Posted my Phase I completion milestone in the CodePath celebration channel.
+- Forked the repository to my GitHub account.
+- Selected the Nightscout custom webhook issue for Phase I.
+- Commented on the GitHub issue introducing myself, explaining my understanding of the issue, and asking for maintainer pointers.
+- Posted in Slack because the CodePath issue sheet was not editable on my end.
+- A CodePath staff member marked the issue as claimed for me in the issue sheet.
+- Posted my Phase I completion milestone in the CodePath celebration channel.
 
 ---
 
