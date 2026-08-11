@@ -1,11 +1,11 @@
 # AI301 Contribution README
 
-Student: Rushikesh Joshi
-GitHub: @joshi-rushikesh
-Course: CodePath AI301 - Summer 2026
-Selected Repository: nightscout/cgm-remote-monitor
-Selected Issue: Custom WebHook Support #5742
-Fork: https://github.com/joshi-rushikesh/cgm-remote-monitor
+Student: Rushikesh Joshi  
+GitHub: @joshi-rushikesh  
+Course: CodePath AI301 - Summer 2026  
+Selected Repository: nightscout/cgm-remote-monitor  
+Selected Issue: Custom WebHook Support #5742  
+Fork: https://github.com/joshi-rushikesh/cgm-remote-monitor  
 
 ---
 
