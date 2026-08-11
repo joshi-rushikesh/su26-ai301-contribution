@@ -1,10 +1,10 @@
 # AI301 Contribution README
 
-Student: Rushikesh Joshi  
-GitHub: @joshi-rushikesh  
-Course: CodePath AI301 - Summer 2026  
-Selected Repository: nightscout/cgm-remote-monitor  
-Selected Issue: Custom WebHook Support #5742  
+Student: Rushikesh Joshi
+GitHub: @joshi-rushikesh
+Course: CodePath AI301 - Summer 2026
+Selected Repository: nightscout/cgm-remote-monitor
+Selected Issue: Custom WebHook Support #5742
 Fork: https://github.com/joshi-rushikesh/cgm-remote-monitor
 
 ---
@@ -380,19 +380,28 @@ I found several existing Nightscout patterns that can guide the implementation:
    ```
 
 2. Normalize configured URL/event pairs into validated webhook destinations.
+
 3. Skip incomplete or malformed configuration safely without crashing Nightscout.
+
 4. Allow only `http:` and `https:` destinations.
+
 5. Add a dedicated notification-webhook sender rather than modifying the existing SGV webhook plugin.
+
 6. Wire custom-webhook dispatch into the notification layer independently of `MAKER_KEY`.
+
 7. Preserve the existing Maker/IFTTT three-event behavior exactly.
+
 8. Match configured custom-webhook events without causing accidental triple delivery.
+
 9. Reuse the existing project's HTTP/HTTPS timeout and error-handling patterns where appropriate.
+
 10. Add focused automated tests for configuration parsing, event matching, multiple destinations, invalid configuration, network errors, and backward compatibility.
+
 11. Update the README and example environment configuration with the new settings and behavior.
 
 #### Implement
 
-Implementation will be completed in Phase III on:
+Implementation was completed in Phase III on:
 
 **Branch:** `wip/custom-webhook-5742`  
 **Branch Link:** https://github.com/joshi-rushikesh/cgm-remote-monitor/tree/wip/custom-webhook-5742  
@@ -400,21 +409,21 @@ Implementation will be completed in Phase III on:
 
 #### Review
 
-Before submitting a pull request, I will:
+Before submitting the pull request, I:
 
-- Review the diff against `CONTRIBUTING.md`
-- Keep changes scoped only to #5742
-- Verify no local environment files or secrets are committed
-- Preserve existing Maker behavior
-- Preserve the existing SGV webhook behavior
-- Run the relevant tests
-- Run the project's linting command
-- Review the PR against Nightscout's expected `dev` target branch
-- Document new configuration as required by the contributing guide
+- Reviewed the diff against `CONTRIBUTING.md`
+- Kept changes scoped to #5742
+- Verified no local environment files or secrets were committed
+- Preserved existing Maker behavior
+- Preserved the existing SGV webhook behavior
+- Ran the relevant tests
+- Ran the project's linting command and compared results with the base branch
+- Targeted Nightscout's `dev` branch
+- Documented the new configuration as required by the contributing guide
 
 #### Evaluate
 
-Planned tests include:
+The implemented test strategy covered:
 
 1. No custom configuration produces no request.
 2. A matching event sends exactly one request to the configured endpoint.
@@ -511,8 +520,7 @@ No new dependencies were added. `package.json`, `package-lock.json`, `lib/plugin
 - `dd352be8` - Add configurable notification webhook routing
 - `1a104a57` - Add tests for custom notification webhooks
 - `1e878fc5` - Document custom notification webhook configuration
-
-After the Phase III readiness audit, I made a final documentation-only correction so the README uses reachable Nightscout low-alarm event examples (`ns-urgent-low` / `ns-warning-low`) instead of an unreachable example event. This correction does not change runtime behavior.
+- `86ab712d` - Clarify custom webhook alarm event names
 
 ### Testing Strategy
 
@@ -649,7 +657,7 @@ The broader unit suite included MongoDB-dependent failures.
 - Manually exercised the real HTTP transport against a local listener.
 - Performed a final read-only maintainer-readiness audit.
 - Corrected the README event example to use actual Nightscout low-alarm event names before PR submission.
-- Prepared the implementation for submission against upstream `dev`.
+- Opened upstream pull request #8580 against Nightscout's `dev` branch.
 
 ---
 
@@ -657,24 +665,84 @@ The broader unit suite included MongoDB-dependent failures.
 
 ### Status
 
-Not Started
+Phase IV Complete - Awaiting Review
 
 ### Pull Request
 
-*To be completed in Phase IV.*
+**PR Link:**  
+https://github.com/nightscout/cgm-remote-monitor/pull/8580
+
+**PR Title:** Add configurable custom notification webhooks (#5742)
+
+**Target:** `nightscout/cgm-remote-monitor:dev`  
+**Source:** `joshi-rushikesh/cgm-remote-monitor:wip/custom-webhook-5742`  
+**Status:** Awaiting review
+
+The pull request is open against the upstream Nightscout `dev` branch and references the original issue with `Closes #5742`.
+
+**Reviewer surfaced:** @AndyLow91 was mentioned in a PR comment because they previously reviewed and merged the closely related Nightscout server-webhook contribution #8427.
 
 ### PR Summary
 
-*To be completed in Phase IV.*
+The pull request adds configurable notification-event webhooks so Nightscout operators can route selected notification events directly to their own HTTP/HTTPS endpoints instead of relying only on the IFTTT Maker destination.
+
+The implementation adds an independent custom-webhook dispatch path, numbered URL/event configuration, secure URL filtering, event matching and deduplication, network error handling, automated tests, and documentation while leaving the existing Maker and SGV-webhook implementations unchanged.
+
+### Acceptance Criteria
+
+- [x] Tests added for new/changed behavior
+- [x] Relevant feature and regression suites pass
+- [x] New and modified files introduce no new lint problems
+- [x] Existing Maker behavior remains unchanged
+- [x] Existing SGV-webhook behavior remains unchanged
+- [x] No breaking changes intentionally introduced
+- [x] Documentation updated
+- [x] Pull request targets upstream `dev`
+- [x] Original issue referenced with `Closes #5742`
+- [ ] Full local unit suite completely green - six MongoDB-dependent failures remain, but they were reproduced without the feature changes and documented as pre-existing local-environment failures
 
 ### Maintainer Feedback Log
 
-*To be completed in Phase IV.*
+- **Aug. 11, 2026:** Opened PR #8580 against `nightscout/cgm-remote-monitor:dev`.
+- **Aug. 11, 2026:** Surfaced the pull request to @AndyLow91 for review because they reviewed and merged the related server-webhook PR #8427.
+- **Current status:** No maintainer feedback has been received yet. The pull request is awaiting review.
+
+Any future maintainer comments, requested changes, and corresponding commit references will be recorded here as the review proceeds.
 
 ### Revisions Made
 
-*To be completed in Phase IV.*
+Before opening the pull request, a final maintainer-readiness audit identified that the new README documentation used an event-name example that is not generated by the current simple-alarm path.
+
+I corrected the documentation in:
+
+- `86ab712d` - Clarify custom webhook alarm event names
+
+The README now uses reachable examples such as `ns-urgent-low` and `ns-warning-low` and explicitly explains that there is no bare `ns-low` event in the current Maker event vocabulary.
+
+No runtime behavior was changed by this revision.
 
 ### Final Reflection
 
-*To be completed in Phase IV.*
+#### Technical Learnings
+
+The biggest technical lesson was that the most obvious place to implement a feature is not always the correct architectural boundary. Initially, extending the existing Maker sender seemed natural because #5742 discusses IFTTT webhooks. Tracing the code showed that Maker's three-event fan-out, destination URL, and key requirement are tightly coupled IFTTT-specific behavior. Building an independent delivery path above that layer reduced regression risk and kept existing Maker behavior untouched.
+
+I also learned the value of examining configuration plumbing and historical code rather than assuming environment-variable names will map automatically. The existing numbered `frameUrl`/`frameName` pattern and recent numeric-suffix support provided a cleaner, project-native solution than modifying the global settings parser.
+
+The security review also changed the implementation. Discovering that normal settings can be surfaced through status output meant webhook URLs containing credentials needed to be treated as secure settings. That finding led directly to an additional regression test and safer logging behavior.
+
+#### Open Source / Engineering Process Learnings
+
+Reading `CONTRIBUTING.md`, existing tests, related code, and git history before implementing was more useful than treating the issue text as a complete specification. The older issue included illustrative names such as `ns-low`, while the current codebase and Maker event documentation showed the actual event vocabulary is level-qualified. A final audit caught this documentation mismatch before the PR was opened.
+
+I also learned to separate failures caused by my change from failures caused by the local environment. Rather than labeling the six broader-suite failures as unrelated without evidence, I reproduced them with the feature source changes removed. That gave me a defensible explanation instead of hiding or attempting to "fix" unrelated code.
+
+The contribution also reinforced that a review-ready PR is more than working code: the diff needs to stay scoped, tests need to explain behavior, configuration and security implications need documentation, and the PR description must give maintainers enough context to review the design.
+
+#### What I Would Do Differently / Next Steps
+
+On a future contribution, I would verify the repository's current default development branch, test-environment requirements, event vocabulary, and closest merged prior art immediately after selecting the issue. That would reduce setup and investigation time.
+
+I would also discuss feature-level design questions with maintainers earlier when possible, especially configuration naming, module placement, and the intentional four-destination limit. The current approach is deliberately easy to extend if maintainers prefer a different cap or module location.
+
+The next step is to monitor PR #8580, respond promptly to maintainer questions or requested changes, push revisions to the same branch, and update this README with each feedback round and commit reference. A merge would be ideal, but the primary goal is to keep the pull request review-ready and actively maintained.
