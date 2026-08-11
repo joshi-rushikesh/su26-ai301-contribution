@@ -213,7 +213,7 @@ The updated branch references a newer `nightscout-connect` version than the curr
 
 12. Inspect the generated destinations.
 
-   **Actual result:** Three requests were generated and all targeted `maker.ifttt.com`. Zero requests targeted the configured custom endpoint.
+**Actual result:** Three requests were generated and all targeted `maker.ifttt.com`. Zero requests targeted the configured custom endpoint.
 
 13. Repeat the investigation after synchronizing with the current `dev` branch to confirm the behavior still exists.
 
@@ -380,23 +380,14 @@ I found several existing Nightscout patterns that can guide the implementation:
    ```
 
 2. Normalize configured URL/event pairs into validated webhook destinations.
-
 3. Skip incomplete or malformed configuration safely without crashing Nightscout.
-
 4. Allow only `http:` and `https:` destinations.
-
 5. Add a dedicated notification-webhook sender rather than modifying the existing SGV webhook plugin.
-
 6. Wire custom-webhook dispatch into the notification layer independently of `MAKER_KEY`.
-
 7. Preserve the existing Maker/IFTTT three-event behavior exactly.
-
 8. Match configured custom-webhook events without causing accidental triple delivery.
-
 9. Reuse the existing project's HTTP/HTTPS timeout and error-handling patterns where appropriate.
-
 10. Add focused automated tests for configuration parsing, event matching, multiple destinations, invalid configuration, network errors, and backward compatibility.
-
 11. Update the README and example environment configuration with the new settings and behavior.
 
 #### Implement
@@ -460,23 +451,205 @@ Planned tests include:
 
 ### Status
 
-Not Started
+Phase III Complete
 
 ### Implementation Notes
 
-*To be completed in Phase III.*
+I implemented configurable custom notification webhooks as an independent sibling delivery path rather than modifying the existing Maker/IFTTT implementation.
+
+The implementation allows operators to configure up to four numbered webhook URL/event pairs:
+
+```text
+CUSTOM_WEBHOOK_URL_1
+CUSTOM_WEBHOOK_EVENT_1
+...
+CUSTOM_WEBHOOK_URL_4
+CUSTOM_WEBHOOK_EVENT_4
+```
+
+When a Nightscout notification matches a configured event, it is sent directly to that destination as a JSON `POST`.
+
+The implementation deliberately leaves `lib/plugins/maker.js` unchanged. Maker's three-request fan-out is an IFTTT-specific compatibility mechanism, so custom webhook delivery is dispatched separately through `lib/server/pushnotify.js`. This also allows custom webhooks to operate without a `MAKER_KEY`.
+
+Configuration was added through core settings using Nightscout's existing numbered-setting convention. This avoids changes to `lib/server/env.js` and produces environment-variable names consistent with the existing `FRAME_URL_1` pattern.
+
+I also identified and addressed a security issue during implementation: Nightscout's status API publishes normal settings, while webhook URLs may contain credentials or tokens. The new custom webhook URL settings were therefore added to `secureSettings`, and a regression test verifies that a token-bearing URL is not exposed through serialized filtered settings.
+
+The sender accepts only `http:` and `https:` URLs, uses an explicit timeout, treats any 2xx response as successful, avoids logging full URLs or notification content, and reports network failures through callbacks without crashing the notification path.
+
+Event matching uses Nightscout's existing Maker event vocabulary:
+
+- `ns-event`
+- `ns-<level>`
+- `ns-<level>-<name>`
+- `ns-allclear`
+
+For example, low blood glucose alarms use level-qualified event names such as `ns-urgent-low` or `ns-warning-low`. There is no bare `ns-low` event in the current Nightscout event vocabulary.
 
 ### Files Changed
 
-*To be completed in Phase III.*
+**Branch:**  
+https://github.com/joshi-rushikesh/cgm-remote-monitor/tree/wip/custom-webhook-5742
+
+**PR Target:** `nightscout/cgm-remote-monitor:dev`
+
+The Phase III implementation changes eight files:
+
+- `lib/server/customwebhook.js` - new custom notification webhook configuration, matching, and HTTP/HTTPS delivery module
+- `lib/server/pushnotify.js` - dispatches custom webhook notifications independently of Maker
+- `lib/settings.js` - declares numbered custom webhook URL/event settings and protects URL values as secure settings
+- `lib/server/bootevent.js` - initializes the custom webhook sender
+- `tests/customwebhook.test.js` - focused tests for custom webhook configuration, matching, payloads, and failure handling
+- `tests/settings.test.js` - tests numbered environment-variable mapping and secret filtering
+- `README.md` - documents custom notification webhook configuration, event matching, payload behavior, and security considerations
+- `docs/example-template.env` - adds commented configuration examples
+
+No new dependencies were added. `package.json`, `package-lock.json`, `lib/plugins/maker.js`, `lib/plugins/webhook.js`, and `lib/server/env.js` remain unchanged.
+
+### Key Commits
+
+- `dd352be8` - Add configurable notification webhook routing
+- `1a104a57` - Add tests for custom notification webhooks
+- `1e878fc5` - Document custom notification webhook configuration
+
+After the Phase III readiness audit, I made a final documentation-only correction so the README uses reachable Nightscout low-alarm event examples (`ns-urgent-low` / `ns-warning-low`) instead of an unreachable example event. This correction does not change runtime behavior.
 
 ### Testing Strategy
 
-*To be completed in Phase III.*
+I added 28 automated tests related to the feature:
+
+- 26 tests in `tests/customwebhook.test.js`
+- 2 tests in `tests/settings.test.js`
+
+The tests cover:
+
+- no configured webhooks
+- complete and incomplete URL/event pairs
+- malformed URLs
+- unsupported URL schemes
+- sparse numbered configuration
+- whitespace normalization
+- matching and non-matching events
+- generic, level-based, and level/name event matching
+- multiple destinations
+- one-request-per-destination deduplication
+- `ns-allclear`
+- notification payload fields
+- announcement flags
+- HTTP and HTTPS target parsing
+- network failure handling
+- secure filtering of webhook URLs
+- numbered environment-variable mapping
+
+Automated tests replace the outbound request seam, so no automated test sends traffic to an external service.
+
+#### Focused Feature Test
+
+```bash
+npx env-cmd -f ./my.test.env npx mocha --timeout 5000 --require ./tests/hooks.js --exit ./tests/customwebhook.test.js
+```
+
+**Result:** 26 passing, 0 failing.
+
+#### Related Regression Suites
+
+```bash
+npx env-cmd -f ./my.test.env npx mocha --timeout 5000 --require ./tests/hooks.js --exit ./tests/maker.test.js ./tests/webhook.test.js ./tests/settings.test.js ./tests/env.test.js
+```
+
+Relevant results:
+
+- `tests/maker.test.js` - 6 passing
+- `tests/webhook.test.js` - 10 passing
+- `tests/settings.test.js` - 16 passing
+- Combined related suites - 55 passing, 0 failing
+
+The existing Maker and SGV-webhook test files were not modified.
+
+#### Broader Unit Suite
+
+The curated unit suite produced:
+
+```text
+293 passing
+6 failing
+```
+
+The six failures were traced to MongoDB-dependent security/authentication tests in the local environment.
+
+To verify that they were not introduced by my changes, I temporarily removed/reverted the custom-webhook source changes and re-ran the failing suites. The same four `verifyauth` timeouts and two `security` failures occurred without the feature present, confirming they are pre-existing environmental failures rather than regressions caused by #5742.
+
+#### Lint
+
+`npm run lint` reports 32 existing issues on the branch.
+
+I verified the same 32 issues occur with the Phase III source changes temporarily removed.
+
+Running ESLint specifically against the modified/new source and test files produced no new lint problems.
+
+### Manual Validation
+
+Because the automated tests stub network delivery, I also validated the actual transport against a local HTTP listener.
+
+Observed behavior:
+
+- HTTP 204 response -> treated as success
+- HTTP 500 response -> treated as failure
+- unavailable/dead port -> error returned through the callback without throwing
+- URL query string -> preserved on the request
+- JSON body -> delivered to the local listener
+- custom webhook delivery -> works when `ctx.maker === null`, confirming that `MAKER_KEY` is not required
+
+### Challenges Faced
+
+**1. Preserving Maker backward compatibility**
+
+The existing Maker sender combines hardcoded IFTTT transport with a three-event fan-out. Extending it directly would have risked changing existing IFTTT behavior.
+
+**Resolution:** I created a sibling custom-webhook delivery path and left `lib/plugins/maker.js` unchanged.
+
+**2. Configuration naming**
+
+The issue illustrates names such as `CUSTOM_WEBHOOK_1_URL`, but Nightscout's current numbered-settings mapping naturally produces `CUSTOM_WEBHOOK_URL_1`, matching the existing `FRAME_URL_1` convention.
+
+**Resolution:** I followed the repository's existing numbered-setting pattern rather than altering the global settings-name parser.
+
+**3. Avoiding accidental multiple webhook deliveries**
+
+Maker generates three names for one notification because of how IFTTT filters events. Reusing that behavior directly could make one custom destination receive duplicate requests.
+
+**Resolution:** Custom webhooks match the same event vocabulary but deduplicate by destination URL so a configured endpoint receives at most one request for a single notification.
+
+**4. Protecting sensitive webhook URLs**
+
+During implementation I found that normal Nightscout settings can be included in status output. Webhook URLs may contain embedded API tokens or secrets.
+
+**Resolution:** Added the URL settings to `secureSettings`, avoided full-URL logging, and added an automated regression test checking that a token-bearing URL does not appear in serialized filtered settings.
+
+**5. Existing local test failures**
+
+The broader unit suite included MongoDB-dependent failures.
+
+**Resolution:** I reproduced those failures with the feature source changes temporarily removed, confirming that they were environmental and unrelated rather than changing unrelated production code to force them green.
 
 ### Progress Log
 
-*To be completed in Phase III.*
+- Synchronized the working branch with current upstream `dev`.
+- Reproduced the missing custom notification-webhook behavior.
+- Traced Maker, push notification, environment, settings, Pushover, and SGV webhook code paths.
+- Used `git log` and `git blame` to determine that Maker's fan-out is an IFTTT-specific historical behavior.
+- Implemented the custom webhook sender and independent notification dispatch.
+- Added secure numbered configuration.
+- Added 28 focused tests.
+- Preserved existing Maker and SGV webhook implementations.
+- Added README and example environment documentation.
+- Ran focused feature tests and related regression suites.
+- Investigated broader unit-suite failures and confirmed they are pre-existing local MongoDB-dependent failures.
+- Ran lint and verified no new lint issues were introduced.
+- Manually exercised the real HTTP transport against a local listener.
+- Performed a final read-only maintainer-readiness audit.
+- Corrected the README event example to use actual Nightscout low-alarm event names before PR submission.
+- Prepared the implementation for submission against upstream `dev`.
 
 ---
 
