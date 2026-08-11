@@ -703,8 +703,8 @@ The implementation adds an independent custom-webhook dispatch path, numbered UR
 
 ### Maintainer Feedback Log
 
-- **Aug. 11, 2026:** Opened PR #8580 against `nightscout/cgm-remote-monitor:dev`.
-- **Aug. 11, 2026:** Surfaced the pull request to @AndyLow91 for review because they reviewed and merged the related server-webhook PR #8427.
+- **August 2026:** Opened PR #8580 against `nightscout/cgm-remote-monitor:dev`.
+- **August 2026:** Surfaced the pull request to @AndyLow91 for review because they reviewed and merged the related server-webhook PR #8427.
 - **Current status:** No maintainer feedback has been received yet. The pull request is awaiting review.
 
 Any future maintainer comments, requested changes, and corresponding commit references will be recorded here as the review proceeds.
